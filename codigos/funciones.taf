@@ -1,0 +1,8 @@
+macorróca chátené doble(chátené x) {
+    lúri x * 2;
+}
+
+macorróca chátené main() {
+    Iherré(doble(4));
+    lúri 0;
+}

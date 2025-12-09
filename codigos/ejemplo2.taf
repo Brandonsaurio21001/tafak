@@ -1,0 +1,7 @@
+ti chátené edad = 20;
+
+wá (edad >= 18) {
+    Iherré("Mayor de edad");
+} pa {
+    Iherré("Menor");
+}
