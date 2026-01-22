@@ -163,10 +163,98 @@ class Parser:
     # -------------------------
     # statements
     # -------------------------
+ 
+
 
     def parse_statement(self):
         # será implementado después
-        raise NotImplementedError
+        tok =  self.peek()
+
+        if tok.type == TokenType.KEYWORD and tok.value == "lúri":
+            return self.parse_return_statement()
+
+        if tok.type == TokenType.KEYWORD and tok.value == "wá":
+            return self.parse_if_statement()
+        
+        if tok.type == TokenType.KEYWORD and tok.value == "pa":
+            return self.parse_else_block()
+        
+        if tok.type == TokenType.KEYWORD and tok.value == "ótacá":
+            return self.parse_while_statement()
+        
+        if tok.type == TokenType.SYMBOL and tok.value == "{":
+            return self.parse_block()
+        
+        expr =  self.parse_expression()
+        self.expect(TokenType.SYMBOL, "se esperaba ';'")
+        return ExprStmt(expr)
+    # -------------------------
+    # Trabajemos la lógica detrás de cada statement
+    # -------------------------    
+
+    # EMPECEMOS CON EL RETURN 
+
+    def parse_return_statement(self):
+        # consumir y validar Luri para el retunr
+        self.expect(TokenType.KEYWORD, "se esperaba 'lúri'")
+        value = None
+
+        #Si NO viene ; entonces hay una expresión de retrno
+        if not(self.peek().type == TokenType.SYMBOL and self.peek().value ==  ";"):
+            value = self.parse_expression()
+        
+        #consumir ;
+        self.expect(TokenType.SYMBOL, "se esperaba ';'")
+
+        return ReturnStmt(value)
+
+    #TRABAJEMOS EL IF
+
+    def parse_if_statement(self):
+        # consumir wa
+        self.expect(TokenType.KEYWORD, "se esperaba 'wá'")
+        # consumir (
+        self.expect(TokenType.SYMBOL, "se esperava '('")
+        condition = self.parse_expression()
+
+        self.expect(TokenType.SYMBOL, "se esperaba ')'")
+
+        then_block = self.parse_block()
+
+        else_block = None
+        if self.peek().type == TokenType.KEYWORD and self.peek().value == "pa":
+            self.advance() #consumir pa
+            else_block = self.parse_block()
+
+        return IfStmt(condition, then_block, else_block)
+
+    # AHORA TRABAJEMOS EL WHILE
+
+    def parse_while_statement(self):
+        self.expect(TokenType.KEYWORD, "se esperaba 'ótacá'")
+        self.expect(TokenType.SYMBOL, "se esperaba '('")
+        conditional = self.parse_expression()
+        self.expect(TokenType.SYMBOL, "se esperaba ')'")
+        body = self.parse_block()
+
+        return WhileStmt(conditional, body)
+    
+
+
+    # TRABAJEMOS EL BLOCK
+
+    def parse_block(self):
+        self.expect(TokenType.SYMBOL, "se esperaba '{'")
+        statements = []
+        
+        while not(self.peek().type == TokenType.SYMBOL and self.peek().value == "}"):
+            stmt = self.parse_statement()
+            statements.append(stmt)
+
+        self.expect(TokenType.SYMBOL, "se esperaba '}'")
+
+        return Block(statements)
+    
 
     # -------------------------
     # expresiones (vendrá pronto)
